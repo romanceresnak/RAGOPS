@@ -1,0 +1,19 @@
+Title: Amazon Bedrock — Overview and Core Capabilities
+
+Amazon Bedrock is a fully managed service that provides access to high-performing foundation models (FMs) from leading AI companies through a single API. The service eliminates the need to manage infrastructure, allowing developers to focus on building generative AI applications.
+
+Bedrock supports models from Anthropic (Claude), Amazon (Titan), Meta (Llama), Mistral AI, Cohere, and AI21 Labs. You can access text generation, image generation, and embedding models through the same unified API surface.
+
+Key capabilities include:
+- Model invocation via InvokeModel and InvokeModelWithResponseStream APIs
+- Bedrock Agents for multi-step task automation
+- Knowledge Bases for Retrieval-Augmented Generation (RAG)
+- Guardrails for responsible AI enforcement
+- Model evaluation and fine-tuning
+- Prompt caching for cost optimisation (Claude models only)
+
+Bedrock integrates natively with other AWS services: S3 for document storage, OpenSearch Serverless for vector search, IAM for access control, CloudWatch for monitoring, and Lambda for serverless orchestration.
+
+Pricing is pay-per-use, based on input and output token counts. With prompt caching enabled, repeated context reads cost 90% less than standard input tokens, making it ideal for workloads with large, static system prompts.
+
+Bedrock is available in us-east-1, us-west-2, eu-west-1, ap-northeast-1, and other regions. Cross-region inference allows automatic routing to the nearest available region for lower latency and higher throughput.

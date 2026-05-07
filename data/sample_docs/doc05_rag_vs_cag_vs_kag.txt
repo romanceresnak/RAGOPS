@@ -1,0 +1,37 @@
+Title: Comparing RAG, CAG, and KAG — Decision Framework
+
+All three patterns — RAG, CAG, and KAG — solve the same fundamental problem: grounding LLM responses in external knowledge. Each has distinct trade-offs across cost, latency, accuracy, and operational complexity.
+
+RAG (Retrieval-Augmented Generation):
+- Best for: Large, dynamic, unstructured knowledge bases
+- Token cost per query: HIGH (1,500–3,500 input tokens)
+- Latency: MEDIUM (embedding + vector search adds 50–200ms)
+- Accuracy: MEDIUM — depends on retrieval quality
+- Operational cost: MEDIUM — vector store required
+- Updates: REAL-TIME — index new documents without re-loading anything
+
+CAG (Cache-Augmented Generation):
+- Best for: Static or slowly changing knowledge bases, high query volume
+- Token cost per query: LOW after warmup (cache reads cost 90% less)
+- Latency: LOW — no retrieval step, predictable
+- Accuracy: HIGH — full context always available, no missed chunks
+- Operational cost: LOW — S3 + Bedrock only, no vector DB
+- Updates: SLOW — cache must be refreshed when knowledge changes
+
+KAG (Knowledge-Augmented Generation):
+- Best for: Structured data, entity relationships, multi-hop reasoning
+- Token cost per query: LOWEST (200–600 tokens of precise facts)
+- Latency: LOW — graph queries are fast for known entities
+- Accuracy: HIGH for in-graph facts, ZERO for out-of-graph questions
+- Operational cost: MEDIUM — Neptune requires VPC, subnet group setup
+- Updates: REAL-TIME — add/modify graph edges without re-embedding
+
+Hybrid approaches:
+- RAG + KAG: Use graph for entity lookups, RAG for supporting detail
+- CAG + KAG: Cache static domain rules, traverse graph for entity-specific facts
+- All three: Route queries by type (structured → KAG, unstructured → RAG, repeated → CAG)
+
+Rule of thumb:
+- < 100K tokens, static content, cost-sensitive → CAG
+- > 1M documents, frequent updates → RAG
+- Structured entity data, reasoning over relationships → KAG

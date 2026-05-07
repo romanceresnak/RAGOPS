@@ -1,0 +1,39 @@
+Title: Token Optimisation Strategies for LLM Applications on AWS Bedrock
+
+Token cost is the primary driver of LLM application running costs. A single percentage-point reduction in average token count compounds significantly at scale. This document outlines proven optimisation techniques applicable to RAG, CAG, and KAG workloads.
+
+1. Context Compression
+Instead of injecting raw retrieved chunks, summarise them first:
+- Pre-compression: 3 chunks × 800 tokens = 2,400 tokens
+- Post-compression: 3 summaries × 200 tokens = 600 tokens
+- Saving: 75% fewer context tokens
+Trade-off: summarisation itself costs tokens and adds latency.
+
+2. Prompt Caching (CAG pattern)
+Mark static portions of the prompt with cache_control: {"type": "ephemeral"}.
+After the first call (cache write), subsequent calls pay only 10% of normal input cost.
+Requirements: Claude model, minimum 1,024 tokens in the cacheable block.
+Savings: up to 87% on input tokens for high-volume repeated-context workloads.
+
+3. Model Tiering
+Route queries by complexity:
+- Simple lookups → Claude Haiku ($0.25/1M input, $1.25/1M output)
+- Complex reasoning → Claude Sonnet ($3.00/1M input, $15.00/1M output)
+- Batch classification → Bedrock Batch Inference (50% discount)
+A routing classifier (lightweight regex or small model) adds < 5ms latency.
+
+4. Chunk Size Tuning
+RAG chunk size directly determines context token count:
+- Too large: irrelevant content inflates token count
+- Too small: insufficient context, poor answer quality
+Optimal range: 512–1,024 tokens per chunk, with 10% overlap.
+
+5. Output Token Control
+Always set max_tokens to a realistic ceiling. Open-ended max_tokens can result in 3–5× over-generation.
+Use stop sequences to terminate generation early when the answer is complete.
+
+6. KAG for Structured Queries
+Knowledge graph facts are typically 5–15 tokens each. A subgraph of 20–40 facts provides rich context in 100–600 tokens — 4–10× fewer tokens than RAG for the same informational value.
+
+7. Bedrock Batch Inference
+For offline workloads (batch embeddings, document classification, report generation), use Bedrock Batch Inference Jobs — 50% cost reduction vs on-demand invocations.

@@ -1,0 +1,40 @@
+Title: Amazon Bedrock Pricing — Token Costs and Cost Optimisation
+
+Bedrock charges per token for foundation model inference. There are no upfront costs or minimum fees. Pricing varies by model and region.
+
+Claude 3.5 Sonnet (anthropic.claude-3-5-sonnet-20241022-v2:0) — us-east-1:
+- Input tokens:           $3.00 per 1,000,000 tokens
+- Output tokens:         $15.00 per 1,000,000 tokens
+- Cache write tokens:     $3.75 per 1,000,000 tokens
+- Cache read tokens:      $0.30 per 1,000,000 tokens
+
+Claude 3 Haiku (anthropic.claude-3-haiku-20240307-v1:0) — us-east-1:
+- Input tokens:           $0.25 per 1,000,000 tokens
+- Output tokens:          $1.25 per 1,000,000 tokens
+
+Amazon Titan Embeddings V2:
+- Per 1,000 tokens:       $0.00002 (approximately $0.02 per 1M tokens)
+
+Cost calculation example for 1,000 queries/day:
+Scenario A — RAG with 2,000 input tokens + 400 output tokens per query:
+  Input:  2,000 × 1,000 × $3.00/1M  = $6.00/day
+  Output:   400 × 1,000 × $15.00/1M = $6.00/day
+  Total:  $12.00/day = $360/month
+
+Scenario B — CAG with 10,000-token cached system prompt (cache hit after first call):
+  Cache write (once):      10,000 × $3.75/1M = $0.0375
+  Cache read per query:    10,000 × 1,000 × $0.30/1M = $3.00/day
+  Output:                    400 × 1,000 × $15.00/1M = $6.00/day
+  Total: ~$9.00/day = $270/month  (−25% vs RAG)
+
+Scenario C — KAG with 400 input tokens + 400 output tokens per query:
+  Input:  400 × 1,000 × $3.00/1M  = $1.20/day
+  Output: 400 × 1,000 × $15.00/1M = $6.00/day
+  Total:  $7.20/day = $216/month   (−40% vs RAG)
+
+Cost optimisation strategies:
+1. Use Claude Haiku for simple queries and Sonnet only for complex reasoning
+2. Enable prompt caching for any repeated context > 1,024 tokens
+3. Compress context: summarise retrieved chunks before injection
+4. Use KAG for structured lookups to minimise context size
+5. Set max_tokens to a realistic ceiling to avoid over-generating

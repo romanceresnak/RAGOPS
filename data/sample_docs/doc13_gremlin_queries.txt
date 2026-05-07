@@ -1,0 +1,41 @@
+Title: Gremlin Query Language for Knowledge Graphs in KAG
+
+Gremlin is the graph traversal language used with Amazon Neptune property graphs (TinkerPop-compatible). In a KAG pipeline, Gremlin queries extract entity relationships that are then serialised into LLM context.
+
+Basic graph model for AWS knowledge:
+  Vertices (nodes): services, features, concepts
+  Edges (relationships): supports, integrates_with, requires, part_of, costs, enables
+
+Example vertices:
+  g.addV('Service').property('name', 'Bedrock').property('category', 'AI/ML')
+  g.addV('Service').property('name', 'Neptune').property('category', 'Database')
+  g.addV('Feature').property('name', 'PromptCaching').property('model', 'Claude')
+
+Example edges:
+  g.V().has('name','Bedrock').addE('supports').to(g.V().has('name','PromptCaching'))
+  g.V().has('name','Bedrock').addE('integrates_with').to(g.V().has('name','S3'))
+  g.V().has('name','PromptCaching').addE('reduces').to(g.V().has('name','InputTokenCost'))
+
+KAG retrieval queries:
+
+1. Get all direct relationships of an entity:
+   g.V().has('name', 'Bedrock').bothE().otherV().path()
+
+2. Two-hop traversal (entity → relation → entity → relation → entity):
+   g.V().has('name', 'Bedrock').repeat(bothE().otherV().simplePath()).times(2).path()
+
+3. Find services that integrate with a given service:
+   g.V().has('name', 'Lambda').out('integrates_with').values('name')
+
+4. Find what a feature enables:
+   g.V().has('name', 'PromptCaching').out('enables').values('name')
+
+Serialising graph paths to LLM context:
+Each path is a list of alternating vertices and edges:
+  [Bedrock, supports, PromptCaching, reduces, InputTokenCost]
+Serialised: "Bedrock supports PromptCaching → PromptCaching reduces InputTokenCost"
+
+Limiting context size:
+- Use .times(2) maximum depth — deeper traversals produce redundant facts
+- Limit to 30–50 paths maximum — beyond that, diminishing returns
+- Filter by edge labels to focus on relevant relationship types

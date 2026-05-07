@@ -1,0 +1,3 @@
+run,query_id,category,complexity,method,query,input_tokens,output_tokens,cached_tokens,cache_write_tokens,cache_status,cost_usd,latency_ms,model_id,is_warmup,cost_usd_verify
+1,q01,overview,medium,CAG,What is Amazon Bedrock and what foundation models does it support?,20,418,8390,0,HIT,0.008847,8477.305665961467,us.anthropic.claude-sonnet-4-6,False,0.008847
+1,q02,cost,medium,CAG,How does prompt caching work on Amazon Bedrock and what are the cost savings?,24,809,8390,0,HIT,0.014724,17599.55608297605,us.anthropic.claude-sonnet-4-6,False,0.014724

@@ -1,0 +1,29 @@
+Title: Retrieval-Augmented Generation (RAG) — Architecture and AWS Implementation
+
+RAG is a technique that grounds LLM responses in factual, up-to-date documents by retrieving relevant context at query time. Unlike fine-tuning, RAG does not modify model weights; instead, it dynamically injects retrieved text into the prompt.
+
+Standard RAG pipeline:
+1. Ingestion — Documents are split into chunks (typically 512–1024 tokens), embedded with a text embedding model, and stored in a vector database.
+2. Retrieval — At query time, the user query is embedded, and the top-K most similar chunks are retrieved via approximate nearest-neighbour (ANN) search.
+3. Augmentation — Retrieved chunks are injected into the LLM prompt as context.
+4. Generation — The LLM generates an answer grounded in the provided context.
+
+AWS implementation options:
+- Embedding model: Amazon Titan Embeddings V2 (1536-dim vectors) via Bedrock
+- Vector store: Amazon OpenSearch Serverless (k-NN), Amazon Aurora pgvector, FAISS (local/in-memory)
+- Document store: Amazon S3
+- Orchestration: Amazon Bedrock Knowledge Bases (managed RAG), or custom Lambda pipeline
+
+Token cost structure per RAG query:
+- Embedding query: ~10 tokens × $0.02/1M = negligible
+- Context injection: typically 1,000–3,000 tokens at $3.00/1M
+- Output: 200–500 tokens at $15.00/1M
+- Total per query: ~$0.005–$0.015
+
+RAG challenges:
+- Retrieval quality depends on embedding model and chunking strategy
+- Long-tail queries may retrieve irrelevant chunks
+- Each query incurs full embedding + vector search latency (typically 50–200ms additional)
+- Context window limits cap the number of retrieved chunks
+
+RAG excels when the knowledge base is large (millions of documents), updated frequently, or when queries require diverse, non-overlapping context fragments.

@@ -1,0 +1,36 @@
+Title: Infrastructure as Code for AI Workloads — Terraform on AWS
+
+Managing AWS infrastructure for AI/ML workloads with Terraform provides reproducibility, version control, and automated drift detection. This document covers best practices for Terraform-managed RAG/CAG/KAG infrastructure.
+
+Module structure:
+A modular Terraform layout separates concerns and enables reuse across environments:
+  modules/networking  — VPC, subnets, security groups, VPC endpoints
+  modules/s3          — Document bucket, lifecycle rules, encryption
+  modules/neptune     — Graph database cluster, subnet group, IAM auth
+  modules/iam         — Application role, least-privilege policies
+  modules/bedrock     — Log group, CloudWatch dashboard, logging role
+
+Key Terraform resources:
+- aws_neptune_cluster: serverless_v2_scaling_configuration block enables Neptune Serverless
+- aws_vpc_endpoint (type=Interface): routes Bedrock API calls through private network
+- aws_vpc_endpoint (type=Gateway): routes S3 traffic without NAT Gateway (free)
+- aws_iam_policy_document: data source for safe, validated IAM policy JSON
+- aws_cloudwatch_dashboard: token usage metrics dashboard in CloudWatch
+
+State management best practices:
+- Store state in S3 backend with DynamoDB locking to prevent concurrent applies
+- Enable state encryption (encrypt = true in S3 backend config)
+- Use separate state files per environment (dev/staging/prod) via workspaces or separate backends
+- Never commit .tfstate files to version control
+
+Cost control with Terraform:
+- Set neptune_serverless = true for dev/staging to idle to minimum NCUs when not in use
+- Set s3_force_destroy = true only in dev (prevents accidental prod data loss)
+- Use terraform plan -out=plan.out before apply in CI/CD pipelines
+- Tag all resources with Environment, Project, and Owner for cost allocation reports
+
+Deployment sequence:
+1. terraform init
+2. terraform plan → review ~25 resources
+3. terraform apply → ~10–15 minutes (Neptune cluster provisioning dominates)
+4. terraform output dotenv_block → copy values into .env

@@ -1,0 +1,7 @@
+run,query_id,category,complexity,method,query,input_tokens,output_tokens,cached_tokens,context_chunks,context_tokens,cost_usd,latency_ms,model_id,cost_usd_verify,cache_write_tokens,cache_status,is_warmup
+1,q01,overview,medium,RAG,What is Amazon Bedrock and what foundation models does it support?,1591,289,0,3.0,1591.0,0.009107999999999998,10585.97537491005,us.anthropic.claude-sonnet-4-6,0.009107999999999998,,,
+1,q01,overview,medium,CAG,What is Amazon Bedrock and what foundation models does it support?,20,397,0,,,0.0374775,14720.330500043929,us.anthropic.claude-sonnet-4-6,0.0374775,8390.0,WRITE,False
+1,q02,cost,medium,RAG,How does prompt caching work on Amazon Bedrock and what are the cost savings?,1406,394,0,3.0,1406.0,0.010127999999999998,18153.0260409927,us.anthropic.claude-sonnet-4-6,0.010127999999999998,,,
+1,q02,cost,medium,CAG,How does prompt caching work on Amazon Bedrock and what are the cost savings?,24,773,8390,,,0.014184,34657.57474990096,us.anthropic.claude-sonnet-4-6,0.014184,0.0,HIT,False
+1,q03,comparison,high,RAG,"What is the difference between RAG, CAG, and KAG for token cost optimisation?",1834,513,0,3.0,1834.0,0.013197,20949.45008296054,us.anthropic.claude-sonnet-4-6,0.013197,,,
+1,q03,comparison,high,CAG,"What is the difference between RAG, CAG, and KAG for token cost optimisation?",27,981,8390,,,0.017313000000000002,23422.297333017923,us.anthropic.claude-sonnet-4-6,0.017313000000000002,0.0,HIT,False

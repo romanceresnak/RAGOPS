@@ -1,0 +1,24 @@
+Title: Prompt Caching on Amazon Bedrock — Cache-Augmented Generation (CAG)
+
+Prompt caching is a Bedrock feature available for Anthropic Claude models that allows frequently reused prompt prefixes to be cached server-side. When the same prefix is used in subsequent requests, Bedrock reads from the cache instead of reprocessing the tokens from scratch.
+
+How it works:
+1. You mark a section of your prompt with the cache_control field: {"type": "ephemeral"}.
+2. On the first call, Bedrock writes the marked tokens to cache — this incurs a 25% surcharge on write tokens (cache_creation_input_tokens).
+3. On every subsequent call that reuses the same prefix, Bedrock reads from cache — these tokens cost only 10% of standard input token price (cache_read_input_tokens).
+4. The cache is valid for 5 minutes of inactivity. Each new read resets the TTL.
+
+Token pricing comparison (Claude 3.5 Sonnet):
+- Standard input:     $3.00 per 1M tokens
+- Cache write:        $3.75 per 1M tokens  (+25%)
+- Cache read:         $0.30 per 1M tokens  (-90%)
+- Output:            $15.00 per 1M tokens
+
+CAG (Cache-Augmented Generation) is an architectural pattern that pre-loads the entire knowledge base into the system prompt, then uses prompt caching to make subsequent queries cheap. Unlike RAG, there is no retrieval step, so latency is more predictable and there are no embedding or vector-search costs.
+
+CAG is most cost-effective when:
+- The knowledge base is static (updated less than once per hour)
+- Query volume is high (many queries reuse the same cached context)
+- Knowledge base size fits within the model's context window (up to 200K tokens for Claude)
+
+For a 10,000-token knowledge base with 100 queries per hour, CAG reduces input token costs by approximately 87% compared to passing full context without caching.

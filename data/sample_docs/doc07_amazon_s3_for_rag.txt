@@ -1,0 +1,33 @@
+Title: Amazon S3 as Document Store for RAG Pipelines
+
+Amazon S3 is the standard document store for RAG workloads on AWS. It provides virtually unlimited storage, 99.999999999% (11 nines) durability, and native integration with Bedrock Knowledge Bases, Lambda, and other services.
+
+Recommended S3 structure for a RAG project:
+  s3://your-bucket/
+  ├── documents/          # raw source documents (PDF, TXT, DOCX)
+  ├── embeddings/         # cached embedding vectors (numpy / FAISS index)
+  ├── benchmark-results/  # CSV outputs from benchmark runs
+  └── bedrock-logs/       # Bedrock invocation logs (JSON)
+
+S3 features relevant to RAG:
+- Versioning: track document changes, roll back to previous versions
+- Event notifications: trigger Lambda to re-embed when a document changes
+- Intelligent-Tiering: automatically move infrequently accessed documents to cheaper storage classes
+- Server-side encryption (SSE-S3 / SSE-KMS): encrypt at rest
+- VPC Gateway Endpoint: access S3 from private subnets without NAT Gateway
+
+Bedrock Knowledge Bases native integration:
+When using Amazon Bedrock Knowledge Bases (managed RAG), you point the service at an S3 prefix and it handles chunking, embedding (Titan or Cohere), and storage in OpenSearch Serverless automatically. The sync job ingests new or changed documents on demand or on a schedule.
+
+Cost considerations:
+- S3 Standard storage: $0.023/GB/month
+- PUT requests: $0.005 per 1,000 requests
+- GET requests: $0.0004 per 1,000 requests
+- Data transfer to Bedrock (same region): free via VPC endpoint
+- For 10,000 documents averaging 5KB each: ~50MB storage = $0.001/month (negligible)
+
+Best practices:
+- Use meaningful S3 key prefixes to enable prefix-based lifecycle policies
+- Enable versioning in production to prevent accidental document loss
+- Tag documents with metadata (source, date, category) for filtered retrieval
+- Set a lifecycle rule to expire old benchmark results after 90 days

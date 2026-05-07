@@ -1,0 +1,35 @@
+# Copy this file: cp terraform.tfvars.example terraform.tfvars
+# Then fill in any values you want to override.
+
+aws_region   = "us-east-1"
+project_name = "ragops"
+environment  = "dev"
+owner        = "roman"
+
+# ── Networking ────────────────────────────────────────────────────────────────
+vpc_cidr             = "10.10.0.0/16"
+availability_zones   = ["us-east-1a", "us-east-1b"]
+private_subnet_cidrs = ["10.10.1.0/24", "10.10.2.0/24"]
+public_subnet_cidrs  = ["10.10.101.0/24", "10.10.102.0/24"]
+
+# ── S3 ────────────────────────────────────────────────────────────────────────
+s3_force_destroy      = true   # set false in prod
+s3_versioning_enabled = true
+s3_log_expiry_days    = 90
+
+# ── Neptune Serverless (recommended for dev — idles to 0) ────────────────────
+neptune_serverless            = true
+neptune_min_ncu               = 1.0
+neptune_max_ncu               = 8.0
+neptune_engine_version        = "1.3.1.0"
+neptune_backup_retention_days = 1
+neptune_skip_final_snapshot   = true
+neptune_iam_auth_enabled      = true
+
+# ── Bedrock ───────────────────────────────────────────────────────────────────
+bedrock_model_ids = [
+  "anthropic.claude-3-5-sonnet-20241022-v2:0",
+  "anthropic.claude-3-haiku-20240307-v1:0",
+  "amazon.titan-embed-text-v2:0",
+]
+bedrock_log_retention_days = 30

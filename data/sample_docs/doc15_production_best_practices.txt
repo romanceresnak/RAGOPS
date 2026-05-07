@@ -1,0 +1,36 @@
+Title: Production Best Practices for RAG/CAG/KAG on AWS
+
+Deploying LLM-augmented retrieval systems in production requires attention to reliability, cost control, observability, and security. This document summarises best practices learned from operating RAG, CAG, and KAG workloads at scale.
+
+Reliability:
+1. Implement retry logic with exponential backoff for Bedrock API calls (ThrottlingException, ServiceUnavailableException).
+2. Set sensible timeouts: read_timeout=60s, connect_timeout=5s for Bedrock boto3 client.
+3. Handle Neptune disconnects — Gremlin WebSocket connections can drop; reconnect automatically.
+4. Cache FAISS indices in memory across Lambda invocations (store in /tmp and check if index exists before rebuilding).
+5. Use Bedrock cross-region inference to fall back to another region if primary region is degraded.
+
+Cost control:
+1. Log every invocation with token counts to DynamoDB or S3 for accurate cost attribution.
+2. Set CloudWatch alarms on InputTokenCount > daily budget threshold.
+3. Use Haiku for routing, classification, and simple Q&A; reserve Sonnet for complex reasoning.
+4. Pre-warm CAG cache at application startup to avoid the first-call cache write penalty.
+5. Set lifecycle rules on S3 to expire Bedrock logs after 90 days.
+
+Observability:
+1. Emit a structured JSON log per query: {"method": "CAG", "query_id": "...", "input_tokens": 320, "cached_tokens": 9800, "output_tokens": 180, "latency_ms": 1240, "cost_usd": 0.0042}.
+2. Build a CloudWatch dashboard with side-by-side RAG vs CAG vs KAG token metrics.
+3. Track cache hit rate daily — a declining hit rate signals that the knowledge base is changing too frequently for CAG to be effective.
+4. Use AWS X-Ray for end-to-end tracing across S3, Bedrock, and Neptune calls.
+
+Security:
+1. Never hard-code AWS credentials — use IAM roles and environment-based credential chain.
+2. Enable Neptune IAM database authentication — no database passwords.
+3. Restrict Bedrock access to specific model ARNs in IAM policies.
+4. Enable S3 bucket versioning and MFA delete for document buckets in production.
+5. Deploy in private subnets; use VPC endpoints for S3 and Bedrock — no traffic over the public internet.
+6. Rotate application secrets via AWS Secrets Manager if any third-party APIs are involved.
+
+Scaling:
+- RAG: Scale FAISS index by sharding across multiple Lambda instances or migrate to OpenSearch Serverless.
+- CAG: Neptune Serverless scales automatically; cache is model-side, not infrastructure.
+- KAG: Neptune Serverless handles read-heavy graph queries; add a read replica for write-heavy ingestion.

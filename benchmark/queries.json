@@ -1,0 +1,142 @@
+[
+  {
+    "id": "q01",
+    "query": "What is Amazon Bedrock and what foundation models does it support?",
+    "entity": "Bedrock",
+    "category": "overview",
+    "complexity": "medium"
+  },
+  {
+    "id": "q02",
+    "query": "How does prompt caching work on Amazon Bedrock and what are the cost savings?",
+    "entity": "PromptCaching",
+    "category": "cost",
+    "complexity": "medium"
+  },
+  {
+    "id": "q03",
+    "query": "What is the difference between RAG, CAG, and KAG for token cost optimisation?",
+    "entity": "RAG",
+    "category": "comparison",
+    "complexity": "high"
+  },
+  {
+    "id": "q04",
+    "query": "How does Amazon Neptune support knowledge graphs in KAG pipelines?",
+    "entity": "Neptune",
+    "category": "infrastructure",
+    "complexity": "medium"
+  },
+  {
+    "id": "q05",
+    "query": "What is the pricing for Claude 3.5 Sonnet input and output tokens on Bedrock?",
+    "entity": "Bedrock",
+    "category": "cost",
+    "complexity": "low"
+  },
+  {
+    "id": "q06",
+    "query": "How do I use FAISS for vector search in a local RAG implementation?",
+    "entity": "FAISS",
+    "category": "implementation",
+    "complexity": "medium"
+  },
+  {
+    "id": "q07",
+    "query": "What IAM permissions are required for a RAG application using Bedrock and S3?",
+    "entity": "IAM",
+    "category": "security",
+    "complexity": "medium"
+  },
+  {
+    "id": "q08",
+    "query": "What is Neptune Serverless and how does it scale for KAG workloads?",
+    "entity": "NeptuneServerless",
+    "category": "infrastructure",
+    "complexity": "medium"
+  },
+  {
+    "id": "q09",
+    "query": "How can I monitor Bedrock token usage and cost using CloudWatch?",
+    "entity": "CloudWatch",
+    "category": "observability",
+    "complexity": "medium"
+  },
+  {
+    "id": "q10",
+    "query": "What is the optimal chunk size for RAG document embedding with Titan V2?",
+    "entity": "TitanEmbedV2",
+    "category": "implementation",
+    "complexity": "medium"
+  },
+  {
+    "id": "q11",
+    "query": "When should I use CAG instead of RAG for a static knowledge base?",
+    "entity": "CAG",
+    "category": "decision",
+    "complexity": "high"
+  },
+  {
+    "id": "q12",
+    "query": "How does Gremlin graph traversal work for entity relationship extraction in KAG?",
+    "entity": "GraphTraversal",
+    "category": "implementation",
+    "complexity": "high"
+  },
+  {
+    "id": "q13",
+    "query": "What are the best practices for deploying RAG on AWS in production?",
+    "entity": "RAG",
+    "category": "production",
+    "complexity": "high"
+  },
+  {
+    "id": "q14",
+    "query": "How does Amazon S3 integrate with Bedrock for document storage in RAG?",
+    "entity": "S3",
+    "category": "infrastructure",
+    "complexity": "low"
+  },
+  {
+    "id": "q15",
+    "query": "What token optimisation strategies reduce Bedrock costs by the most?",
+    "entity": "Bedrock",
+    "category": "cost",
+    "complexity": "high"
+  },
+  {
+    "id": "q16",
+    "query": "How do I use IAM database authentication with Amazon Neptune?",
+    "entity": "IAMDatabaseAuth",
+    "category": "security",
+    "complexity": "medium"
+  },
+  {
+    "id": "q17",
+    "query": "What is the context window size for Claude 3.5 Sonnet and Claude 3 Haiku?",
+    "entity": "Claude-3.5-Sonnet",
+    "category": "overview",
+    "complexity": "low"
+  },
+  {
+    "id": "q18",
+    "query": "How does Terraform provision Amazon Neptune Serverless infrastructure?",
+    "entity": "Terraform",
+    "category": "infrastructure",
+    "complexity": "medium"
+  },
+  {
+    "id": "q19",
+    "query": "What are the latency differences between RAG, CAG, and KAG approaches?",
+    "entity": "RAG",
+    "category": "performance",
+    "complexity": "high"
+  },
+  {
+    "id": "q20",
+    "query": "How does KAG reduce input token count compared to RAG for the same query?",
+    "entity": "KAG",
+    "category": "comparison",
+    "complexity": "high"
+  }
+]

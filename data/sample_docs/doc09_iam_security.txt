@@ -1,0 +1,36 @@
+Title: IAM Security for RAG/CAG/KAG on AWS — Least-Privilege Design
+
+Securing AI inference workloads on AWS requires applying the principle of least privilege: each component should have only the permissions it needs, nothing more.
+
+Application role permissions breakdown:
+
+1. Bedrock: bedrock:InvokeModel and bedrock:InvokeModelWithResponseStream
+   - Scope to specific model ARNs, not wildcard "*"
+   - Example ARN: arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-5-sonnet-20241022-v2:0
+
+2. S3: s3:GetObject, s3:PutObject, s3:ListBucket
+   - Scope to specific bucket ARN, not all S3
+   - Use prefix conditions to limit access to specific prefixes if needed
+
+3. Neptune: neptune-db:connect, neptune-db:ReadDataViaQuery, neptune-db:WriteDataViaQuery
+   - Neptune IAM auth eliminates the need for database passwords
+   - The connection uses AWS Signature V4 signing on the WebSocket handshake
+   - Scope to specific cluster resource ID for tightest control
+
+4. CloudWatch Logs: logs:CreateLogStream, logs:PutLogEvents
+   - Required for Lambda execution roles
+   - Scope to specific log group ARN
+
+IAM authentication for Neptune:
+When iam_database_authentication_enabled = true on the Neptune cluster, every connection must present a valid AWS Signature V4 signed request. The gremlinpython library combined with requests-aws4auth handles this transparently:
+
+  from requests_aws4auth import AWS4Auth
+  auth = AWS4Auth(access_key, secret_key, region, 'neptune-db', session_token=session_token)
+
+This eliminates credential rotation for the database — access is controlled entirely through IAM policies and roles.
+
+VPC isolation:
+- Neptune must run in private subnets (no public access)
+- Security group allows inbound on port 8182 only from the application security group
+- No inbound rules from 0.0.0.0/0
+- Bedrock and S3 accessed via VPC endpoints — traffic never leaves the AWS network

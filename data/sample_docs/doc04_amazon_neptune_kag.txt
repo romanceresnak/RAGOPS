@@ -1,0 +1,26 @@
+Title: Amazon Neptune and Knowledge-Augmented Generation (KAG)
+
+Amazon Neptune is a fully managed graph database service that supports both property graphs (Gremlin) and RDF graphs (SPARQL). It is purpose-built for highly connected datasets such as social networks, recommendation engines, fraud detection, and knowledge graphs.
+
+Neptune Serverless automatically scales capacity from 0.5 to 128 Neptune Capacity Units (NCUs) based on workload. When idle, it scales to the minimum configured NCU, making it cost-effective for intermittent workloads.
+
+Knowledge-Augmented Generation (KAG) uses a knowledge graph as the retrieval source instead of unstructured document chunks. The knowledge graph stores entities (nodes) and relationships (edges) in a structured, traversable format.
+
+KAG query flow:
+1. Entity extraction — The user query is parsed to identify key entities (e.g., "Bedrock", "Claude", "pricing").
+2. Graph traversal — Neptune is queried for the subgraph surrounding those entities (depth 1–3 hops).
+3. Fact serialisation — Graph paths are converted to natural language facts: "Bedrock → supports → Claude-3.5-Sonnet".
+4. Generation — The serialised facts are passed as context to the LLM.
+
+Advantages over RAG:
+- Structured facts → smaller, more precise context → fewer input tokens
+- No embedding required → lower cost and latency
+- Multi-hop reasoning: can answer questions like "What services does Bedrock integrate with that also support IAM auth?"
+- No hallucinated connections — only explicitly stored relationships are surfaced
+
+Token cost comparison:
+- RAG context: 1,500–3,000 tokens per query
+- KAG context: 200–600 tokens per query (facts only)
+- Cost reduction: ~60–80% fewer input tokens vs RAG
+
+Neptune connection uses Gremlin over WebSocket (port 8182). IAM authentication is enforced using AWS Signature V4 — no database passwords required. The gremlinpython library with requests-aws4auth handles signing automatically.

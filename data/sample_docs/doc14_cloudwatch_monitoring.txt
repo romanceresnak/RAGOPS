@@ -1,0 +1,39 @@
+Title: CloudWatch Monitoring for Bedrock Token Usage and Cost Visibility
+
+Amazon CloudWatch provides native metrics for Amazon Bedrock that enable real-time visibility into token consumption, latency, and cost attribution across RAG, CAG, and KAG workloads.
+
+Available Bedrock CloudWatch metrics:
+- InputTokenCount: total input tokens per invocation (includes cache write tokens)
+- OutputTokenCount: generated output tokens per invocation
+- CacheReadInputTokenCount: tokens read from prompt cache (CAG metric)
+- CacheCreationInputTokenCount: tokens written to prompt cache
+- InvocationLatency: end-to-end latency in milliseconds
+- Invocations: count of model invocations
+- InvocationThrottles: throttled requests (relevant for high-volume workloads)
+- InvocationClientErrors / InvocationServerErrors: error monitoring
+
+Dimension: ModelId — all metrics can be filtered by model ID, enabling per-model cost attribution.
+
+Useful CloudWatch metric math expressions:
+
+Total input cost per day (Sonnet):
+  METRICS("AWS/Bedrock", "InputTokenCount", "ModelId", "anthropic.claude-3-5-sonnet-20241022-v2:0")
+  × 3.00 / 1000000
+
+Cache savings ratio:
+  CacheReadInputTokenCount / (InputTokenCount + CacheReadInputTokenCount)
+  → Values close to 1.0 indicate maximum CAG efficiency
+
+CAG dashboard widgets to track:
+1. Input tokens vs cache read tokens (stacked area chart) — visualises cache hit ratio
+2. Cost per hour by method (line chart with metric math)
+3. p99 latency by model (line chart)
+4. Total invocations per method (bar chart)
+
+Bedrock invocation logging:
+Enable logging via the Bedrock console or Terraform (aws_bedrock_model_invocation_logging_configuration resource).
+Logs are delivered to CloudWatch Logs and/or S3 in JSON format.
+Each log record contains: modelId, inputTokens, outputTokens, cacheReadTokens, latencyMs, requestId.
+
+Cost anomaly detection:
+Set up AWS Cost Anomaly Detection on the Bedrock service to receive alerts when spending exceeds expected baselines. This provides a safety net against runaway benchmark loops or misconfigured cache sizes.

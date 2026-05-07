@@ -1,0 +1,33 @@
+Title: FAISS Vector Search for Local RAG — Embeddings with Titan V2
+
+FAISS (Facebook AI Similarity Search) is an open-source library for efficient nearest-neighbour search in dense vector spaces. It is the standard choice for local or in-memory vector search when a managed service like OpenSearch Serverless is not required.
+
+Amazon Titan Embeddings V2 produces 1,536-dimensional float32 vectors. These vectors capture semantic meaning — similar texts produce similar vectors (high cosine similarity).
+
+Building a FAISS index:
+1. Load all documents from S3 or local disk.
+2. For each document, call Bedrock InvokeModel with Titan Embeddings V2.
+3. Stack all vectors into a numpy float32 array of shape (N, 1536).
+4. Create a FAISS IndexFlatL2 or IndexFlatIP (inner product for cosine similarity).
+5. Add all vectors with index.add(vectors).
+6. Save index to disk with faiss.write_index(index, path).
+
+Query process:
+1. Embed the query string using the same Titan V2 model.
+2. Run index.search(query_vector, k) to get the k nearest neighbours.
+3. Map returned indices back to document metadata (stored separately in JSON).
+4. Return the top-k document chunks as retrieved context.
+
+Performance characteristics:
+- IndexFlatL2: exact search, O(N) per query, accurate but slow for N > 1M
+- IndexIVFFlat: approximate, faster, requires training on a sample
+- For N < 100,000 documents, IndexFlatL2 is fast enough (< 10ms per query)
+
+Titan V2 embedding cost:
+- ~$0.02 per 1M tokens
+- Average document = 500 tokens → 10,000 docs = 5M tokens → $0.10 total ingestion cost
+
+Comparison with OpenSearch Serverless (AOSS):
+- FAISS: free, local, no infra; loses data on restart unless persisted to S3
+- AOSS: managed, scalable, persistent; starts at ~$700/month for minimum capacity
+- For demo and dev workloads, FAISS with S3 persistence is the right choice

@@ -1,0 +1,10 @@
+{
+  "CAG": {
+    "avg_input_tokens": 22.0,
+    "avg_output_tokens": 613.5,
+    "avg_cached_tokens": 8390.0,
+    "avg_cost_usd": 0.011786,
+    "avg_latency_ms": 13038.4,
+    "total_queries": 2
+  }
+}
